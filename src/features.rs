@@ -605,6 +605,20 @@ pub mod vsock {
     impl crate::FeatureBits for F {}
 }
 
+pub mod blk {
+    use crate::le128;
+
+    feature_bits! {
+        /// Block Device Feature Bits
+        #[doc(alias = "VIRTIO_BLK_F")]
+        pub struct F: le128 {
+
+        }
+    }
+
+    impl crate::FeatureBits for F {}
+}
+
 pub mod balloon {
     use crate::le128;
 
