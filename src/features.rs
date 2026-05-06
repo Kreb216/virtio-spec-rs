@@ -612,7 +612,63 @@ pub mod blk {
         /// Block Device Feature Bits
         #[doc(alias = "VIRTIO_BLK_F")]
         pub struct F: le128 {
+            /// Maximum size of any single segment is in size_max.
+            #[doc(alias = "VIRTIO_BLK_F_SIZE_MAX")]
+            const SIZE_MAX = 1 << 1;
 
+            /// Maximum number of segments in a request is in seg_max.
+            #[doc(alias = "VIRTIO_BLK_F_SEG_MAX")]
+            const SEG_MAX = 1 << 2;
+
+            /// Disk-style geometry specified in geometry.
+            #[doc(alias = "VIRTIO_BLK_F_GEOMETRY")]
+            const GEOMETRY = 1 << 4;
+
+            /// Device is read-only.
+            #[doc(alias = "VIRTIO_BLK_F_RO")]
+            const RO = 1 << 5;
+
+            /// Block size of disk is in blk_size.
+            #[doc(alias = "VIRTIO_BLK_F_BLK_SIZE")]
+            const BLK_SIZE = 1 << 6;
+
+            /// Cache flush command support.
+            #[doc(alias = "VIRTIO_BLK_F_FLUSH")]
+            const FLUSH = 1 << 9;
+
+            ///Device exports information on optimal I/O alignment.
+            #[doc(alias = "VIRTIO_BLK_F_TOPOLOGY")]
+            const TOPOLOGY = 1 << 10;
+
+            ///Device can toggle its cache between writeback and writethrough modes.
+            #[doc(alias = "VIRTIO_BLK_F_CONFIG_WCE")]
+            const CONFIG_WCE = 1 << 11;
+
+            ///Device supports multiqueue.
+            #[doc(alias = "VIRTIO_BLK_F_MQ")]
+            const MQ = 1 << 12;
+
+            /// Device can support discard command, maximum discard sectors
+            /// size in max_discard_sectors and maximum discard
+            /// segment number in max_discard_seg.
+            #[doc(alias = "VIRTIO_BLK_F_DISCARD")]
+            const DISCARD = 1 << 13;
+
+            /// Device can support write zeroes command, maximum write zeroes sectors
+            /// size in max_write_zeroes_sectors and maximum write zeroes segment
+            /// number in max_write_zeroes_seg.
+            #[doc(alias = "VIRTIO_BLK_F_WRITE_ZEROES")]
+            const WRITE_ZEROES = 1 << 14;
+
+            /// Device supports providing storage lifetime information.
+            #[doc(alias = "VIRTIO_BLK_F_LIFETIME")]
+            const LIFETIME = 1 << 15;
+
+            /// Device supports secure erase command, maximum erase sectors count
+            /// in max_secure_erase_sectors and maximum erase segment number
+            /// in max_secure_erase_seg.
+             #[doc(alias = "VIRTIO_BLK_F_SECURE_ERASE")]
+            const SECURE_ERASE = 1 << 16;
         }
     }
 
