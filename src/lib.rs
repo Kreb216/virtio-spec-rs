@@ -64,7 +64,7 @@
 //! | Device Type                       | Available | Module      |
 //! | --------------------------------- | --------- | ----------- |
 //! | Network Device                    | ✅        | [`net`]     |
-//! | Block Device                      | ❌        |             |
+//! | Block Device                      | ❌         |  [`blk`]    |
 //! | Console Device                    | ✅        | [`console`] |
 //! | Entropy Device                    | ❌        |             |
 //! | Traditional Memory Balloon Device | ✅        | [`balloon`] |
