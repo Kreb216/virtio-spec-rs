@@ -8,7 +8,7 @@
 //!
 //! - `VIRTIO_NET_F_CSUM` from the specification becomes [`virtio::net::F::CSUM`] in this crate.
 //! - `virtio_net_config` from the specification becomes [`virtio::net::Config`] in this crate.
-//!  
+//!
 //! [`virtio::net::F::CSUM`]: net::F::CSUM
 //! [`virtio::net::Config`]: net::Config
 //!
@@ -95,6 +95,7 @@ mod bitflags;
 #[macro_use]
 pub mod volatile;
 pub mod balloon;
+pub mod blk;
 pub mod console;
 #[cfg(any(feature = "mmio", feature = "pci"))]
 mod driver_notifications;
