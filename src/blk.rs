@@ -76,8 +76,11 @@ pub struct Config {
 #[derive(VolatileFieldAccess)]
 #[repr(C)]
 pub struct VirtioBlkGeometry {
+    #[access(ReadOnly)]
     cylinders: le16,
+    #[access(ReadOnly)]
     heads: u8,
+    #[access(ReadOnly)]
     sectors: u8,
 }
 
@@ -94,12 +97,16 @@ pub struct VirtioBlkGeometry {
 #[repr(C)]
 pub struct VirtioBlkTopology {
     // # of logical blocks per physical block (log2)
+    #[access(ReadOnly)]
     physical_block_exp: u8,
     // offset of first aligned logical block
+    #[access(ReadOnly)]
     alignment_offset: u8,
     // suggested minimum I/O size in blocks
+    #[access(ReadOnly)]
     min_io_size: le16,
     // optimal (suggested maximum) I/O size in blocks
+    #[access(ReadOnly)]
     opt_io_size: le32,
 }
 
