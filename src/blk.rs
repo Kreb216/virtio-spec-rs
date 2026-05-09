@@ -1,6 +1,8 @@
 //! Block Device
 
 use bitfield_struct::bitfield;
+use core::alloc::Layout;
+use core::ptr::{self, NonNull, addr_of_mut};
 use endian_num::{le16, le32};
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 use volatile::access::ReadOnly;
@@ -110,23 +112,78 @@ pub struct VirtioBlkTopology {
     opt_io_size: le32,
 }
 
+/// A request
 #[doc(alias = "virtio_blk_req")]
-#[cfg_attr(
-    feature = "zerocopy",
-    derive(
-        zerocopy_derive::KnownLayout,
-        zerocopy_derive::Immutable,
-        zerocopy_derive::FromBytes,
-    )
-)]
-#[derive(VolatileFieldAccess)]
+#[derive(Debug)]
 #[repr(C)]
-pub struct VirtioBlkReq {
-    pub type_: le32,
+pub struct Req {
+    pub ty: le32,
     pub reserved: le32,
     pub sector: le64,
-    pub data: [u8; 1], //TODO: u8 data[]; Will be modelled
-    pub status: u8,
+    data_and_status: [u8],
+}
+
+impl Req {
+    pub fn layout(data_len: usize) -> Layout {
+        let start = Layout::array::<le64>(2).unwrap();
+        let (new_layout, _offset) = start
+            .extend(Layout::array::<u8>(data_len + 1).unwrap())
+            .unwrap();
+        new_layout.pad_to_align()
+    }
+
+    pub fn from_ptr(ptr: NonNull<[u8]>) -> Option<NonNull<Self>> {
+        let len = ptr.as_ptr().len();
+        // FIXME: use ptr::as_mut_ptr once stable
+        // https://github.com/rust-lang/rust/issues/74265
+        let ptr = ptr.as_ptr() as *mut u8;
+
+        if !ptr.cast::<le64>().is_aligned() {
+            return None;
+        }
+
+        let len = len - 16;
+        let ptr = ptr::slice_from_raw_parts(ptr, len) as *mut Self;
+        Some(NonNull::new(ptr).unwrap())
+    }
+
+    pub fn data_ptr(this: NonNull<Self>) -> NonNull<[u8]> {
+        let ptr = unsafe { addr_of_mut!((*this.as_ptr()).data_and_status) };
+        let len = ptr.len().saturating_sub(1);
+        let ptr = NonNull::new(ptr).unwrap().cast::<u8>();
+        NonNull::slice_from_raw_parts(ptr, len)
+    }
+
+    pub fn data(&self) -> &[u8] {
+        let ptr = Self::data_ptr(NonNull::from(self));
+        unsafe { ptr.as_ref() }
+    }
+
+    pub fn data_mut(&mut self) -> &mut [u8] {
+        let mut ptr = Self::data_ptr(NonNull::from(self));
+        unsafe { ptr.as_mut() }
+    }
+
+    pub fn status_ptr(this: NonNull<Self>) -> Option<NonNull<u8>> {
+        let ptr = unsafe { addr_of_mut!((*this.as_ptr()).data_and_status) };
+        let len = ptr.len();
+
+        if len == 0 {
+            return None;
+        }
+
+        let ptr = NonNull::new(ptr).unwrap().cast::<u8>();
+        let ptr = unsafe { ptr.add(len - 1) };
+        Some(ptr)
+    }
+
+    pub fn status(&self) -> Option<&u8> {
+        Self::status_ptr(NonNull::from(self)).map(|ptr| unsafe { ptr.as_ref() })
+    }
+
+    pub fn status_mut(&mut self) -> Option<&mut u8> {
+        Self::status_ptr(NonNull::from(self)).map(|mut ptr| unsafe { ptr.as_mut() })
+    }
 }
 
 #[doc(alias = "VIRTIO_BLK_T")]
